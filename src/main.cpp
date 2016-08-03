@@ -15,12 +15,10 @@ reading of 345 corresponds to 345 * 8.75 = 3020 mdps = 3.02 dps.
 #include "Wire.h"
 #include "L3G.h"
 #include "LSM303.h"
-#include "math.h"
-#include "IMUHelper.h"
+#include "IMUHelper/IMUHelper.h"
 #include "MadgwickAHRS.h"
 
 #define SAMPLE_RATE 50
-#define betaDef 0.5f
 
 L3G gyro;
 LSM303 compass;
