@@ -2,16 +2,14 @@
 #include <L3G.h>
 #include <LSM303.h>
 #include <math.h>
+#include <MadgwickAHRS.h>
 
 #ifndef IMU_HELPER
-#define IMUHELPER
+#define IMU_HELPER
 
 #define ACC_CALIB (0.00005f)
-//#define ACC_CALIB (1)
 #define GYRO_CALIB (0.01f)
-//#define GYRO_CALIB (1)
 #define MAG_CALIB (0.0001f)
-//#define MAG_CALIB (1)
 
 #define MAG_OFF_X -153
 #define MAG_OFF_Y -798
@@ -26,17 +24,24 @@ struct Reading {
     float mag_x, mag_y, mag_z;
 };
 
-class IMUHelper
-{
+class IMUHelper {
 public:
     void getReading(Reading *reading);
-    IMUHelper(L3G *gyro_in, LSM303 *compass_in) :
+    void printReading(void);
+    void printReading(Reading *reading);
+    void printOrientation(void);
+    IMUHelper(L3G *gyro_in, LSM303 *compass_in, Madgwick *filter_in) :
         gyro(gyro_in),
-        compass(compass_in)
+        compass(compass_in),
+        filter(filter_in)
     {}
 private:
     L3G *gyro;
     LSM303 *compass;
+    Madgwick *filter;
+    Reading _reading;
+
+    float pitch, roll, heading;
 
     void getCalibratedAcc(Reading *reading);
     void getCalibratedGyro(Reading *reading);

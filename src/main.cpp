@@ -16,72 +16,52 @@ reading of 345 corresponds to 345 * 8.75 = 3020 mdps = 3.02 dps.
 #include "L3G.h"
 #include "LSM303.h"
 #include "IMUHelper/IMUHelper.h"
-#include "MadgwickAHRS.h"
 
 #define SAMPLE_RATE 50
+#define LED 13
 
 L3G gyro;
 LSM303 compass;
-Reading r;
-IMUHelper helper(&gyro, &compass);
 Madgwick filter;
+IMUHelper helper(&gyro, &compass, &filter);
 
-char report[80];
-unsigned long timeNow, timePrev;
-float roll, pitch, heading;
+uint8_t ledState = HIGH;
+unsigned long timeNow, timePrevLED, timePrev;
 
-void printAll() {
-
-    helper.getReading(&r);
-    Serial.print(r.acc_x);Serial.print(",");
-    Serial.print(r.acc_y);Serial.print(",");
-    Serial.print(r.acc_z);Serial.print(",");
-    Serial.print(r.gyro_x);Serial.print(",");
-    Serial.print(r.gyro_y);Serial.print(",");
-    Serial.print(r.gyro_z);Serial.print(",");
-    Serial.print(r.mag_x);Serial.print(",");
-    Serial.print(r.mag_y);Serial.print(",");
-    Serial.print(r.mag_z);Serial.print(",");
-    Serial.println(timeNow);
-}
-
-void printOrientation() {
-    helper.getReading(&r);
-    filter.update(
-        r.gyro_x, r.gyro_y, r.gyro_z,
-        r.acc_x, r.acc_y, r.acc_z,
-        r.mag_x, r.mag_y, r.mag_z
-    );
-
-    roll = filter.getRoll();
-    pitch = filter.getPitch();
-    heading = filter.getYaw();
-    Serial.print("Orientation: ");
-    Serial.print(heading);
-    Serial.print(" ");
-    Serial.print(pitch);
-    Serial.print(" ");
-    Serial.println(roll);
-}
+Reading reading;
 
 void setup() {
+    Serial.println("Begin setup");
     Serial.begin(9600);
     Wire.begin();
 
+    Serial.println("Init IMU");
     gyro.init();
     gyro.enableDefault();
     compass.init();
     compass.enableDefault();
+    Serial.println("IMU Initialised");
+
+    pinMode(LED, OUTPUT);
+    digitalWrite(LED, ledState);
 
     filter.begin(SAMPLE_RATE);
+    Serial.println("Setup complete");
 
+    timePrevLED = millis();
     timePrev = millis();
 }
 
 void loop() {
     timeNow = millis();
-    if (timeNow >= timePrev + SAMPLE_RATE) {
-        printOrientation();
+    if (timeNow >= timePrevLED + 1000) {
+        ledState = ledState == HIGH ? LOW : HIGH;
+        digitalWrite(LED, ledState);
+        timePrevLED = timeNow;
+    }
+
+    if (timeNow > timePrev + SAMPLE_RATE) {
+        helper.printOrientation();
         timePrev = timeNow;
     }
 }
