@@ -7,9 +7,9 @@
 #ifndef IMU_HELPER
 #define IMU_HELPER
 
-#define ACC_CALIB (0.00005f)
-#define GYRO_CALIB (0.01f)
-#define MAG_CALIB (0.0001f)
+#define ACC_CALIB (0.000061f)
+#define GYRO_CALIB (0.00875f)
+#define MAG_CALIB (0.00016f)
 
 #define MAG_OFF_X -153
 #define MAG_OFF_Y -798
