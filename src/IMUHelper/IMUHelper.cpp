@@ -63,3 +63,15 @@ void IMUHelper::printOrientation(void) {
     Serial.print(" ");
     Serial.println(roll);
 }
+
+void IMUHelper::getOrientation(Orientation *o) {
+    getReading(&_reading);
+    filter->update(
+            _reading.gyro_x, _reading.gyro_y, _reading.gyro_z,
+            _reading.acc_x, _reading.acc_y, _reading.acc_z,
+            _reading.mag_x, _reading.mag_y, _reading.mag_z
+    );
+    o->pitch = filter->getPitch();
+    o->roll = filter->getRoll();
+    o->yaw = filter->getYaw();
+}

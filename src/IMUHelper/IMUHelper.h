@@ -24,11 +24,16 @@ struct Reading {
     float mag_x, mag_y, mag_z;
 };
 
+struct Orientation {
+    double pitch, roll, yaw;
+};
+
 class IMUHelper {
 public:
     void getReading(Reading *reading);
     void printReading(void);
     void printReading(Reading *reading);
+    void getOrientation(Orientation *o);
     void printOrientation(void);
     IMUHelper(L3G *gyro_in, LSM303 *compass_in, Madgwick *filter_in) :
         gyro(gyro_in),
